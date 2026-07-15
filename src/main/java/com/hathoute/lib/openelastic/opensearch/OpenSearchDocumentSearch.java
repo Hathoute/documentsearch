@@ -1,5 +1,15 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.opensearch;
 
+import com.hathoute.lib.openelastic.BulkEntry;
+import com.hathoute.lib.openelastic.DocumentSearch;
+import com.hathoute.lib.openelastic.DocumentSearchException;
+import com.hathoute.lib.openelastic.query.BoolQuery;
+import com.hathoute.lib.openelastic.query.DateRangeQuery;
+import com.hathoute.lib.openelastic.query.MatchAllQuery;
+import com.hathoute.lib.openelastic.query.MatchQuery;
+import com.hathoute.lib.openelastic.query.NumberRangeQuery;
+import com.hathoute.lib.openelastic.query.Query;
+import com.hathoute.lib.openelastic.query.TermQuery;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
@@ -30,17 +40,16 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Objects;
 
-
 /**
  * {@link DocumentSearch} backed by the official {@code opensearch-java}
  * client (built on the Apache HttpClient 5 based low-level REST client).
  */
-final class OpenSearchDocumentSearch implements DocumentSearch {
+public final class OpenSearchDocumentSearch implements DocumentSearch {
 
     private final OpenSearchClient client;
     private final RestClient restClient;
 
-    OpenSearchDocumentSearch(OpenSearchConfiguration configuration) {
+    public OpenSearchDocumentSearch(OpenSearchConfiguration configuration) {
         HttpHost host = new HttpHost(configuration.scheme(), configuration.host(),
                 configuration.port());
 

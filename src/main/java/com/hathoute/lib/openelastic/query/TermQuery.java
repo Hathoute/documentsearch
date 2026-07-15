@@ -1,4 +1,4 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.query;
 
 /** A {@code term} (not analyzed) query on the given {@code field} for {@code value}. */
 public record TermQuery(String field, Object value) implements Query {

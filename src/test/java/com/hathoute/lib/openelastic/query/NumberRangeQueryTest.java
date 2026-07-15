@@ -1,4 +1,4 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.query;
 
 import org.junit.jupiter.api.Test;
 

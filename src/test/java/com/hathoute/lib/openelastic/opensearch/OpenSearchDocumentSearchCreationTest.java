@@ -1,5 +1,6 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.opensearch;
 
+import com.hathoute.lib.openelastic.DocumentSearch;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

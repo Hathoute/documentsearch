@@ -1,5 +1,11 @@
 package com.hathoute.lib.openelastic;
 
+import com.hathoute.lib.openelastic.elasticsearch.ElasticSearchConfiguration;
+import com.hathoute.lib.openelastic.elasticsearch.ElasticSearchDocumentSearch;
+import com.hathoute.lib.openelastic.opensearch.OpenSearchConfiguration;
+import com.hathoute.lib.openelastic.opensearch.OpenSearchDocumentSearch;
+import com.hathoute.lib.openelastic.query.Query;
+
 import java.util.List;
 
 /**

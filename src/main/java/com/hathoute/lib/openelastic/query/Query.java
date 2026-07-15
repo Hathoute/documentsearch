@@ -1,4 +1,4 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.query;
 
 /**
  * Root of the lightweight query DSL. Maps to the native query types of both

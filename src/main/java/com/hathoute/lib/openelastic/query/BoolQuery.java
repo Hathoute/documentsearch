@@ -1,4 +1,4 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.query;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.opensearch;
 
 /**
  * Configuration for an OpenSearch backend.

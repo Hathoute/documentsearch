@@ -1,5 +1,8 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.opensearch;
 
+import com.hathoute.lib.openelastic.BulkEntry;
+import com.hathoute.lib.openelastic.DocumentSearch;
+import com.hathoute.lib.openelastic.query.Query;
 import org.apache.hc.core5.http.HttpHost;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 
 @Testcontainers
 class OpenSearchDocumentSearchIT {
@@ -328,17 +332,17 @@ class OpenSearchDocumentSearchIT {
         String index = "it-range-date-format";
         search.createIndex(index);
         search.bulk(index, List.of(
-                BulkEntry.of("1", new ElasticSearchDocumentSearchIT.Product("1", "A", 10.0, "2023-01-15")),
-                BulkEntry.of("2", new ElasticSearchDocumentSearchIT.Product("2", "B", 20.0, "2024-10-15")),
-                BulkEntry.of("3", new ElasticSearchDocumentSearchIT.Product("3", "C", 30.0, "2024-12-15"))));
+                BulkEntry.of("1", new Product("1", "A", 10.0, "2023-01-15")),
+                BulkEntry.of("2", new Product("2", "B", 20.0, "2024-10-15")),
+                BulkEntry.of("3", new Product("3", "C", 30.0, "2024-12-15"))));
         refresh(index);
 
-        List<ElasticSearchDocumentSearchIT.Product> results = search.search(index,
+        List<Product> results = search.search(index,
                 Query.date("creationDate").gte("01-10-2024")
                         .format("MM-dd-yyyy").timeZone("UTC").build(),
-                ElasticSearchDocumentSearchIT.Product.class);
+                Product.class);
         assertThat(results).hasSize(2);
-        assertThat(results.stream().map(ElasticSearchDocumentSearchIT.Product::getSku)).containsExactlyInAnyOrder("2", "3");
+        assertThat(results.stream().map(Product::getSku)).containsExactlyInAnyOrder("2", "3");
 
         search.deleteIndex(index);
     }

@@ -1,10 +1,20 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonpMapper;
+import com.hathoute.lib.openelastic.BulkEntry;
+import com.hathoute.lib.openelastic.DocumentSearch;
+import com.hathoute.lib.openelastic.DocumentSearchException;
+import com.hathoute.lib.openelastic.query.BoolQuery;
+import com.hathoute.lib.openelastic.query.DateRangeQuery;
+import com.hathoute.lib.openelastic.query.MatchAllQuery;
+import com.hathoute.lib.openelastic.query.MatchQuery;
+import com.hathoute.lib.openelastic.query.NumberRangeQuery;
+import com.hathoute.lib.openelastic.query.Query;
+import com.hathoute.lib.openelastic.query.TermQuery;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -15,11 +25,11 @@ import java.util.Objects;
  * {@link DocumentSearch} backed by the official {@code elasticsearch-java}
  * client.
  */
-final class ElasticSearchDocumentSearch implements DocumentSearch {
+public final class ElasticSearchDocumentSearch implements DocumentSearch {
 
     private final ElasticsearchClient client;
 
-    ElasticSearchDocumentSearch(ElasticSearchConfiguration configuration) {
+    public ElasticSearchDocumentSearch(ElasticSearchConfiguration configuration) {
         this.client = ElasticsearchClient.of(b -> b
                 .host(configuration.serverUrl())
                 .apiKey(configuration.apiKey()));

@@ -1,4 +1,4 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.query;
 
 /**
  * A numeric {@code range} query on the given {@code field} with optional lower

@@ -1,7 +1,10 @@
-package com.hathoute.lib.openelastic;
+package com.hathoute.lib.openelastic.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.GetResponse;
+import com.hathoute.lib.openelastic.BulkEntry;
+import com.hathoute.lib.openelastic.DocumentSearch;
+import com.hathoute.lib.openelastic.query.Query;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
