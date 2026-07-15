@@ -1,10 +1,14 @@
 package com.hathoute.lib.openelastic;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.GetResponse;
+import org.apache.hc.core5.http.HttpHost;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.core.GetResponse;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -14,54 +18,44 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Integration tests for {@link ElasticSearchDocumentSearch} backed by a real
- * ElasticSearch node started via Testcontainers.
- *
- * <p>Documents are written through the {@link DocumentSearch} abstraction and
- * fetched back through the native {@code ElasticsearchClient} (the Elastic
- * "high level" client) to independently verify the result.</p>
- */
 @Testcontainers
-class ElasticSearchDocumentSearchIT {
+class OpenSearchDocumentSearchIT {
 
-    private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:9.3.0";
+    private static final String IMAGE = "opensearchproject/opensearch:2.19.0";
 
     @Container
-    static final ElasticsearchContainer container =
-            new ElasticsearchContainer(IMAGE)
-                    // Run the node without security so the abstraction's apiKey
-                    // header is simply ignored and we connect over plain HTTP.
-                    .withEnv("xpack.security.enabled", "false")
-                    .withEnv("xpack.security.http.ssl.enabled", "false")
-                    .withEnv("xpack.security.transport.ssl.enabled", "false")
+    @SuppressWarnings("resource")
+    static final GenericContainer<?> container =
+            new GenericContainer<>(IMAGE)
                     .withEnv("discovery.type", "single-node")
+                    .withEnv("DISABLE_SECURITY_PLUGIN", "true")
+                    .withExposedPorts(9200)
                     .withStartupTimeout(Duration.ofMinutes(3));
 
-    private static String url;
     private static DocumentSearch search;
-    // The native Elastic high level client, used to fetch and verify data
-    // independently from the DocumentSearch abstraction under test.
-    private static ElasticsearchClient raw;
+    private static OpenSearchClient raw;
 
     @BeforeAll
     static void setUp() {
-        url = "http://" + container.getHttpHostAddress();
-        search = DocumentSearch.ofElasticSearch(
-                ElasticSearchConfiguration.builder()
-                        .serverUrl(url)
-                        .apiKey("test-key")
+        String host = container.getHost();
+        int port = container.getMappedPort(9200);
+        search = DocumentSearch.ofOpenSearch(
+                OpenSearchConfiguration.builder()
+                        .scheme("http")
+                        .host(host)
+                        .port(port)
                         .build());
-        raw = ElasticsearchClient.of(b -> b.host(url));
+        raw = new OpenSearchClient(
+                new RestClientTransport(
+                        RestClient.builder(new HttpHost("http", host, port)).build(),
+                        new JacksonJsonpMapper()));
     }
 
-    /** Fetch a document through the native client (independent verification). */
     private Product fetch(String index, String id) throws Exception {
         GetResponse<Product> response = raw.get(g -> g.index(index).id(id), Product.class);
         return response.found() ? response.source() : null;
     }
 
-    /** Force freshly indexed documents to be searchable (search is near-real-time). */
     private void refresh(String index) throws Exception {
         raw.indices().refresh(r -> r.index(index));
     }
@@ -334,17 +328,17 @@ class ElasticSearchDocumentSearchIT {
         String index = "it-range-date-format";
         search.createIndex(index);
         search.bulk(index, List.of(
-                BulkEntry.of("1", new Product("1", "A", 10.0, "2023-01-15")),
-                BulkEntry.of("2", new Product("2", "B", 20.0, "2024-10-15")),
-                BulkEntry.of("3", new Product("3", "C", 30.0, "2024-12-15"))));
+                BulkEntry.of("1", new ElasticSearchDocumentSearchIT.Product("1", "A", 10.0, "2023-01-15")),
+                BulkEntry.of("2", new ElasticSearchDocumentSearchIT.Product("2", "B", 20.0, "2024-10-15")),
+                BulkEntry.of("3", new ElasticSearchDocumentSearchIT.Product("3", "C", 30.0, "2024-12-15"))));
         refresh(index);
 
-        List<Product> results = search.search(index,
+        List<ElasticSearchDocumentSearchIT.Product> results = search.search(index,
                 Query.date("creationDate").gte("01-10-2024")
                         .format("MM-dd-yyyy").timeZone("UTC").build(),
-                Product.class);
+                ElasticSearchDocumentSearchIT.Product.class);
         assertThat(results).hasSize(2);
-        assertThat(results.stream().map(Product::getSku)).containsExactlyInAnyOrder("2", "3");
+        assertThat(results.stream().map(ElasticSearchDocumentSearchIT.Product::getSku)).containsExactlyInAnyOrder("2", "3");
 
         search.deleteIndex(index);
     }

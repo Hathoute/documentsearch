@@ -11,6 +11,7 @@ import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -29,6 +30,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Objects;
 
+
 /**
  * {@link DocumentSearch} backed by the official {@code opensearch-java}
  * client (built on the Apache HttpClient 5 based low-level REST client).
@@ -43,13 +45,15 @@ final class OpenSearchDocumentSearch implements DocumentSearch {
                 configuration.port());
 
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(new AuthScope(host),
-                new UsernamePasswordCredentials(configuration.username(),
-                        passwordChars(configuration.password())));
+        if (configuration.username() != null || configuration.password() != null) {
+            credentialsProvider.setCredentials(new AuthScope(host),
+                    new UsernamePasswordCredentials(configuration.username(),
+                            passwordChars(configuration.password())));
+        }
 
         RestClientBuilder builder = RestClient.builder(host)
                 .setHttpClientConfigCallback(httpClientBuilder -> configure(
-                        httpClientBuilder, credentialsProvider, configuration.skipSslVerification()));
+                        httpClientBuilder, credentialsProvider, false));
 
         this.restClient = builder.build();
         RestClientTransport transport =
@@ -220,6 +224,30 @@ final class OpenSearchDocumentSearch implements DocumentSearch {
                             bb.filter(bq.filter().stream().map(this::toOsQuery).toList());
                         }
                         return bb;
+                    }));
+        }
+        if (query instanceof NumberRangeQuery r) {
+            return org.opensearch.client.opensearch._types.query_dsl.Query
+                    .of(b -> b.range(rb -> {
+                        rb.field(r.field());
+                        if (r.gt() != null) rb.gt(JsonData.of(r.gt()));
+                        if (r.gte() != null) rb.gte(JsonData.of(r.gte()));
+                        if (r.lt() != null) rb.lt(JsonData.of(r.lt()));
+                        if (r.lte() != null) rb.lte(JsonData.of(r.lte()));
+                        return rb;
+                    }));
+        }
+        if (query instanceof DateRangeQuery r) {
+            return org.opensearch.client.opensearch._types.query_dsl.Query
+                    .of(b -> b.range(rb -> {
+                        rb.field(r.field());
+                        if (r.gt() != null) rb.gt(JsonData.of(r.gt()));
+                        if (r.gte() != null) rb.gte(JsonData.of(r.gte()));
+                        if (r.lt() != null) rb.lt(JsonData.of(r.lt()));
+                        if (r.lte() != null) rb.lte(JsonData.of(r.lte()));
+                        if (r.format() != null) rb.format(r.format());
+                        if (r.timeZone() != null) rb.timeZone(r.timeZone());
+                        return rb;
                     }));
         }
         throw new IllegalStateException("Unsupported query type: " + query);

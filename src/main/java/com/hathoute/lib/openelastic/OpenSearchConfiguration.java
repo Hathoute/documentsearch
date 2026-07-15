@@ -15,7 +15,6 @@ public final class OpenSearchConfiguration {
     private final int port;
     private final String username;
     private final String password;
-    private final boolean skipSslVerification;
 
     private OpenSearchConfiguration(Builder builder) {
         this.scheme = builder.scheme;
@@ -23,7 +22,6 @@ public final class OpenSearchConfiguration {
         this.port = builder.port;
         this.username = builder.username;
         this.password = builder.password;
-        this.skipSslVerification = builder.skipSslVerification;
     }
 
     public String scheme() {
@@ -46,10 +44,6 @@ public final class OpenSearchConfiguration {
         return password;
     }
 
-    public boolean skipSslVerification() {
-        return skipSslVerification;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
@@ -60,7 +54,6 @@ public final class OpenSearchConfiguration {
         private int port = 9200;
         private String username;
         private String password;
-        private boolean skipSslVerification = false;
 
         public Builder scheme(String scheme) {
             this.scheme = scheme;
@@ -84,11 +77,6 @@ public final class OpenSearchConfiguration {
 
         public Builder password(String password) {
             this.password = password;
-            return this;
-        }
-
-        public Builder skipSslVerification(boolean skipSslVerification) {
-            this.skipSslVerification = skipSslVerification;
             return this;
         }
 

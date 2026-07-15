@@ -167,6 +167,30 @@ final class ElasticSearchDocumentSearch implements DocumentSearch {
                         return bb;
                     }));
         }
+        if (query instanceof NumberRangeQuery r) {
+            return co.elastic.clients.elasticsearch._types.query_dsl.Query
+                    .of(b -> b.range(rb -> rb.number(nrb -> {
+                        nrb.field(r.field());
+                        if (r.gt() != null) nrb.gt(r.gt());
+                        if (r.gte() != null) nrb.gte(r.gte());
+                        if (r.lt() != null) nrb.lt(r.lt());
+                        if (r.lte() != null) nrb.lte(r.lte());
+                        return nrb;
+                    })));
+        }
+        if (query instanceof DateRangeQuery r) {
+            return co.elastic.clients.elasticsearch._types.query_dsl.Query
+                    .of(b -> b.range(rb -> rb.date(drb -> {
+                        drb.field(r.field());
+                        if (r.gt() != null) drb.gt(r.gt());
+                        if (r.gte() != null) drb.gte(r.gte());
+                        if (r.lt() != null) drb.lt(r.lt());
+                        if (r.lte() != null) drb.lte(r.lte());
+                        if (r.format() != null) drb.format(r.format());
+                        if (r.timeZone() != null) drb.timeZone(r.timeZone());
+                        return drb;
+                    })));
+        }
         throw new IllegalStateException("Unsupported query type: " + query);
     }
 
