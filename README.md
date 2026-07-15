@@ -6,7 +6,7 @@ A lightweight Java library that provides a unified abstraction over Elasticsearc
 
 `open-elastic` wraps the official Elasticsearch Java client and the official OpenSearch Java client behind a single, consistent interface (`DocumentSearch`). Write your code once against the abstraction and choose which backend to use at construction time.
 
-Both backend dependencies are **optional** — consumers include only the one they need.
+Both backends are bundled by default — no extra dependencies required.
 
 ## Usage
 
@@ -17,29 +17,6 @@ Both backend dependencies are **optional** — consumers include only the one th
     <groupId>com.hathoute.lib</groupId>
     <artifactId>open-elastic</artifactId>
     <version>1.0-SNAPSHOT</version>
-</dependency>
-```
-
-Add one or both backend dependencies:
-
-```xml
-<!-- Elasticsearch -->
-<dependency>
-    <groupId>co.elastic.clients</groupId>
-    <artifactId>elasticsearch-java</artifactId>
-    <version>9.3.0</version>
-</dependency>
-
-<!-- OpenSearch -->
-<dependency>
-    <groupId>org.opensearch.client</groupId>
-    <artifactId>opensearch-rest-client</artifactId>
-    <version>3.7.0</version>
-</dependency>
-<dependency>
-    <groupId>org.opensearch.client</groupId>
-    <artifactId>opensearch-java</artifactId>
-    <version>3.9.0</version>
 </dependency>
 ```
 
