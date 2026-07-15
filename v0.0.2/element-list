@@ -1,0 +1,4 @@
+com.hathoute.lib.openelastic
+com.hathoute.lib.openelastic.elasticsearch
+com.hathoute.lib.openelastic.opensearch
+com.hathoute.lib.openelastic.query
