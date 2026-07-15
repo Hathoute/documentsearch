@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hathoute.lib</groupId>
-    <artifactId>open-elastic</artifactId>
+    <artifactId>documentsearch</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -21,29 +21,25 @@
     </properties>
 
     <dependencies>
-        <!-- ElasticSearch backend (optional: consumers add the one they need).
-             elasticsearch-java transitively brings elasticsearch-rest5-client
-             (Apache HttpClient 5 based transport). -->
+        <!-- ElasticSearch backend. elasticsearch-java transitively
+             brings elasticsearch-rest5-client (Apache HttpClient 5 based transport). -->
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
             <version>${elasticsearch.version}</version>
-            <optional>true</optional>
         </dependency>
 
-        <!-- OpenSearch backend (optional). opensearch-rest-client is Apache
+        <!-- OpenSearch backend. opensearch-rest-client is Apache
              HttpClient 5 based. -->
         <dependency>
             <groupId>org.opensearch.client</groupId>
             <artifactId>opensearch-rest-client</artifactId>
             <version>${opensearch.rest.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.opensearch.client</groupId>
             <artifactId>opensearch-java</artifactId>
             <version>${opensearch.java.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- Test -->
@@ -94,6 +90,23 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals><goal>jar-no-fork</goal></goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
