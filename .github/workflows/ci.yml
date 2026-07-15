@@ -17,3 +17,13 @@ jobs:
           java-version: 17
           cache: maven
       - run: mvn verify -B
+
+  javadoc:
+    needs: build
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/javadoc.yml
+    permissions:
+      contents: write
+    with:
+      deploy-dir: main
+    secrets: inherit

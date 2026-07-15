@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>open-elastic Javadoc</title>
+  <title>documentsearch Javadoc</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -52,12 +52,15 @@
       color: #777;
       margin-top: 0.2rem;
     }
+    .loading { text-align: center; color: #999; padding: 2rem; }
+    .error { text-align: center; color: #c00; padding: 2rem; }
     footer {
       padding: 1.5rem;
       font-size: 0.85rem;
       color: #999;
       text-align: center;
     }
+    footer a { color: #1a1a2e; }
   </style>
 </head>
 <body>
@@ -67,11 +70,31 @@
   </header>
   <main>
     <ul class="version-list" id="versions">
-      <li><a href="./main/">main <span class="meta">latest development build</span></a></li>
+      <li class="loading">Loading versions...</li>
     </ul>
   </main>
   <footer>
     <a href="https://github.com/hathoute/documentsearch">GitHub</a>
   </footer>
+  <script>
+    fetch('./versions.json')
+      .then(r => { if (!r.ok) throw new Error('Failed to load'); return r.json(); })
+      .then(versions => {
+        const ul = document.getElementById('versions');
+        ul.innerHTML = '';
+        versions.forEach(v => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = './' + v.path + '/';
+          a.innerHTML = v.label + ' <span class="meta">' + v.description + '</span>';
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+      })
+      .catch(() => {
+        document.getElementById('versions').innerHTML =
+          '<li class="error">Failed to load version list.</li>';
+      });
+  </script>
 </body>
 </html>

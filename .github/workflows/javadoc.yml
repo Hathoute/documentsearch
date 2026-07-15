@@ -1,22 +1,23 @@
 name: Javadoc
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      deploy-dir:
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      deploy-dir:
+        required: true
+        type: string
+        default: main
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  contents: write
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,29 +27,73 @@ jobs:
           java-version: 17
           cache: maven
 
+      - name: Set Maven version for release
+        if: startsWith(inputs.deploy-dir, 'v')
+        shell: bash
+        run: |
+          MVN_VER="${{ inputs.deploy-dir }}"
+          MVN_VER="${MVN_VER#v}"
+          mvn versions:set -DnewVersion="$MVN_VER" -q
+
       - name: Generate Javadoc
         run: mvn javadoc:javadoc -B -q
 
-      - name: Prepare Pages artifact
+      - name: Checkout gh-pages branch
         shell: bash
         run: |
-          mkdir -p _site/main
-          cp gh-pages-index.html _site/index.html
-          cp -r target/reports/apidocs/* _site/main/
-          touch _site/.nojekyll
+          git clone --branch gh-pages --single-branch \
+            "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+            gh-pages 2>/dev/null || {
+            mkdir gh-pages
+            cd gh-pages
+            git init -b gh-pages
+            git remote add origin \
+              "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+          }
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
+      - name: Deploy javadoc and build versions.json
+        shell: bash
+        run: |
+          DIR="${{ inputs.deploy-dir }}"
+          rm -rf "gh-pages/$DIR"
+          mkdir -p "gh-pages/$DIR"
+          cp -r target/reports/apidocs/* "gh-pages/$DIR/"
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - id: deployment
-        name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+          cd gh-pages
+          json="["
+          first=true
+          for d in */; do
+            d="${d%/}"
+            [ "$d" = "index.html" ] && continue
+            [ "$d" = "versions.json" ] && continue
+            [ -f "$d" ] && continue
+            desc=""
+            if [ "$d" = "main" ]; then
+              desc="latest development build"
+            else
+              desc="stable release"
+            fi
+            if [ "$first" = true ]; then
+              first=false
+            else
+              json+=","
+            fi
+            json+='{"path":"'"$d"'","label":"'"$d"'","description":"'"$desc"'"}'
+          done
+          json+="]"
+          echo "$json" > versions.json
+          cd ..
+
+          cp gh-pages-index.html gh-pages/index.html
+
+      - name: Commit and push gh-pages
+        shell: bash
+        run: |
+          cd gh-pages
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "Update javadoc for ${{ inputs.deploy-dir }}"
+          git push origin HEAD:gh-pages
