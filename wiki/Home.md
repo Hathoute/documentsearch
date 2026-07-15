@@ -7,8 +7,7 @@ Both backends are bundled by default — no extra dependencies required.
 ## Getting Started
 
 - [[Installation]] — Add open-elastic to your Maven project
-- [[API Reference]] — Full API documentation (or [browse the Javadoc](https://<owner>.github.io/documentsearch/))
-- [[Javadoc]] — Generated Javadoc HTML
+- [[API Reference]] — Full API documentation (or [browse the Javadoc](https://hathoute.github.io/documentsearch/main/))
 - [[Version Overrides]] — How to override bundled dependency versions using Maven excludes
 
 ## Requirements

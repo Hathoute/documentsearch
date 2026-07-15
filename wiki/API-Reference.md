@@ -1,6 +1,6 @@
 # API Reference
 
-> The generated Javadoc is also available at: [https://&lt;owner&gt;.github.io/documentsearch/](https://&lt;owner&gt;.github.io/documentsearch/)
+> The generated Javadoc is also available at: [https://hathoute.github.io/documentsearch/main/](https://hathoute.github.io/documentsearch/main/)
 
 ## Package overview
 

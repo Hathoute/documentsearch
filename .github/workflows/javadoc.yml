@@ -32,7 +32,9 @@ jobs:
       - name: Prepare Pages artifact
         shell: bash
         run: |
-          cp -r target/reports/apidocs _site
+          mkdir -p _site/main
+          cp gh-pages-index.html _site/index.html
+          cp -r target/reports/apidocs/* _site/main/
           touch _site/.nojekyll
 
       - name: Upload Pages artifact
